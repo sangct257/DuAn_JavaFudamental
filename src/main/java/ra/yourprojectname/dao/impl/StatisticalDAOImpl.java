@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StatisticalDAOImpl implements StatisticalDAO {
@@ -15,7 +16,7 @@ public class StatisticalDAOImpl implements StatisticalDAO {
     // Thống kê tổng số lượng khóa học và tổng số học viên
     @Override
     public Map<String, Integer> getTotalOverview() {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new LinkedHashMap<>();
         Connection con;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -42,7 +43,7 @@ public class StatisticalDAOImpl implements StatisticalDAO {
     // Thống kê tổng số học viên theo từng khóa
     @Override
     public Map<String, Integer> getStudentCountByCourse() {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new LinkedHashMap<>();
         Connection con;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -69,7 +70,7 @@ public class StatisticalDAOImpl implements StatisticalDAO {
     // Thống kê top 5 khóa học đông sinh viên nhất
     @Override
     public Map<String, Integer> getTop5Courses() {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new LinkedHashMap<>();
         Connection con;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -96,7 +97,7 @@ public class StatisticalDAOImpl implements StatisticalDAO {
     // Liệt kê các khóa học có trên 10 học viên
     @Override
     public Map<String, Integer> getCoursesWithMoreThan10Students() {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new LinkedHashMap<>();
         Connection con;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -107,7 +108,7 @@ public class StatisticalDAOImpl implements StatisticalDAO {
                     "JOIN Enrollment e ON c.id = e.course_id " +
                     "WHERE e.status = 'CONFIRMED'::enrollment_status " +
                     "GROUP BY c.id, c.name " +
-                    "HAVING COUNT(e.student_id) > 10 " + // Điều kiện gom nhóm
+                    "HAVING COUNT(e.student_id) > 10 " +
                     "ORDER BY total DESC");
             rs = pstmt.executeQuery();
             while (rs.next()) {

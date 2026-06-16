@@ -14,7 +14,7 @@ public class DatabaseSeeder {
             if (rs.next() && rs.getInt(1) == 0) {
                 pstmt = con.prepareStatement("INSERT INTO Admin (username, password) VALUES (?, ?)");
                 pstmt.setString(1, "admin");
-                pstmt.setString(2, PasswordHasher.hashPassword( "123456"));
+                pstmt.setString(2, PasswordBcrypt.passwordBcrypt( "123456"));
                 pstmt.executeUpdate();
                 System.out.println("[Database Seed]: Khởi tạo tài khoản Admin mặc định thành công! (Tài khoản: admin / Pass: 123456)");
             }
@@ -30,7 +30,7 @@ public class DatabaseSeeder {
                 pstmt.setString(3, "hocvien@gmail.com");
                 pstmt.setBoolean(4, true);
                 pstmt.setString(5, "0976541238");
-                pstmt.setString(6, PasswordHasher.hashPassword( "123456"));
+                pstmt.setString(6, PasswordBcrypt.passwordBcrypt( "123456"));
                 pstmt.executeUpdate();
 
                 System.out.println("[Database Seed]: Khởi tạo tài khoản Học viên mẫu thành công! (Email: hocvien@gmail.com / Pass: 123456)");

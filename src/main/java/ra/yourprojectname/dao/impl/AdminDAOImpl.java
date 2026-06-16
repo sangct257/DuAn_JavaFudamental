@@ -2,7 +2,7 @@ package ra.yourprojectname.dao.impl;
 
 import ra.yourprojectname.dao.AdminDAO;
 import ra.yourprojectname.until.DBUtility;
-import ra.yourprojectname.until.PasswordHasher;
+import ra.yourprojectname.until.PasswordBcrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,14 +19,18 @@ public class AdminDAOImpl implements AdminDAO {
         ResultSet rs = null;
         con = DBUtility.openConnection();
         try {
-            pstmt = con.prepareStatement("select * from Admin where username=? and password=?");
+            pstmt = con.prepareStatement("select * from Admin where username=?");
             pstmt.setString(1, username);
-            pstmt.setString(2, PasswordHasher.hashPassword(password));
             rs = pstmt.executeQuery();
             if (rs.next()) {
-                flag = true;
+                String hashedPassword = rs.getString("password");
+                if (PasswordBcrypt.checkPassword(password, hashedPassword)){
+                    flag = true;
+                } else {
+                    System.out.println("Sai mật khẩu!");
+                }
             } else {
-                System.out.println("Sai username hoặc password");
+                System.out.println("Tài khoản đăng nhập không tồn tại!");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

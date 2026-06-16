@@ -327,7 +327,7 @@ public class EnrollmentView {
         System.out.printf("| %-12s | %-25s | %-12s | %-30s | %-15s |\n", "MÃ HỌC VIÊN", "TÊN HỌC VIÊN", "MÃ KHÓA HỌC", "TÊN KHÓA HỌC", "TRẠNG THÁI");
         System.out.println("--------------------------------------------------------------------------------------------------------------");
         if (list == null || list.isEmpty()) {
-            System.out.println("|                                   Không có dữ liệu học viên đăng ký!                                          |");
+            System.out.println("|                                  Không có dữ liệu học viên đăng ký!                                        |");
         } else {
             for (Enrollment e : list) {
                 System.out.printf("| %-12d | %-25s | %-12d | %-30s | %-15s |\n",

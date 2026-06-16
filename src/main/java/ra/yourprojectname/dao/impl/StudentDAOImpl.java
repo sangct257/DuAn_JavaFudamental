@@ -3,7 +3,7 @@ package ra.yourprojectname.dao.impl;
 import ra.yourprojectname.dao.StudentDAO;
 import ra.yourprojectname.model.Student;
 import ra.yourprojectname.until.DBUtility;
-import ra.yourprojectname.until.PasswordHasher;
+import ra.yourprojectname.until.PasswordBcrypt;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,14 +20,18 @@ public class StudentDAOImpl implements StudentDAO{
         ResultSet rs = null;
         con = DBUtility.openConnection();
         try {
-            pstmt = con.prepareStatement("SELECT * FROM Student WHERE email = ? AND password = ?");
+            pstmt = con.prepareStatement("SELECT * FROM Student WHERE email = ?");
             pstmt.setString(1,email);
-            pstmt.setString(2, PasswordHasher.hashPassword(password));
             rs = pstmt.executeQuery();
             if (rs.next()) {
-                flag = true;
+                String hashedPassword = rs.getString("password");
+                if (PasswordBcrypt.checkPassword(password, hashedPassword)){
+                    flag = true;
+                } else {
+                    System.out.println("Sai mật khẩu!");
+                }
             } else {
-                System.err.println("Sai email hoặc mật khẩu đăng nhập!");
+                System.err.println("Email của người dùng không tồn tại!");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -134,7 +138,7 @@ public class StudentDAOImpl implements StudentDAO{
             pstmt.setString(3, student.getEmail());
             pstmt.setBoolean(4, student.isSex());
             pstmt.setString(5, student.getPhone());
-            pstmt.setString(6, PasswordHasher.hashPassword(student.getPassword()));
+            pstmt.setString(6, PasswordBcrypt.passwordBcrypt(student.getPassword()));
             int i = pstmt.executeUpdate();
             if (i > 0) {
                 flag = true;
@@ -186,13 +190,14 @@ public class StudentDAOImpl implements StudentDAO{
         PreparedStatement pstmt = null;
         con = DBUtility.openConnection();
         try {
-            pstmt = con.prepareStatement("UPDATE Student SET name = ?, dob = ?, email = ?, sex = ?, phone = ? WHERE id = ?");
+            pstmt = con.prepareStatement("UPDATE Student SET name = ?, dob = ?, email = ?, sex = ?, phone = ?, password = ? WHERE id = ?");
             pstmt.setString(1,student.getName());
             pstmt.setDate(2, new java.sql.Date(student.getDob().getTime()));
             pstmt.setString(3,student.getEmail());
             pstmt.setBoolean(4,student.isSex());
             pstmt.setString(5,student.getPhone());
-            pstmt.setInt(6,student.getId());
+            pstmt.setString(6, student.getPassword());
+            pstmt.setInt(7,student.getId());
             int i = pstmt.executeUpdate();
             if (i > 0) {
                 flag = true;

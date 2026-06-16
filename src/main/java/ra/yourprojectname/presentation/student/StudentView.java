@@ -10,7 +10,7 @@ import ra.yourprojectname.model.Course;
 import ra.yourprojectname.model.Enrollment;
 import ra.yourprojectname.model.EnrollmentStatus;
 import ra.yourprojectname.model.Student;
-import ra.yourprojectname.until.PasswordHasher;
+import ra.yourprojectname.until.PasswordBcrypt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -300,13 +300,32 @@ public class StudentView {
     // --- Chức năng 5: Đổi mật khẩu ---
     private void changePassword(Scanner scanner) {
         System.out.println("\n--- ĐỔI MẬT KHẨU TÀI KHOẢN ---");
-        String passwordOld = inputString(scanner,"Nhập mật khẩu hiện tại: ");
-        if (!passwordOld.equals(currentStudent.getPassword())) {
-            System.out.println("Mật khẩu không chính xác!");
+        String passwordOld = inputString(scanner, "Nhập mật khẩu hiện tại: ");
+
+        if (!PasswordBcrypt.checkPassword(passwordOld, currentStudent.getPassword())) {
+            System.out.println("Mật khẩu hiện tại không chính xác!");
             return;
         }
-        String passwordNew = inputString(scanner,"Nhập mật khẩu mới: ");
-        currentStudent.setPassword(PasswordHasher.hashPassword(passwordNew));
+
+        // 2. Nhập mật khẩu mới 2 lần (Dùng vòng lặp để bắt nhập lại nếu gõ sai)
+        String passwordNew;
+        while (true) {
+            passwordNew = inputString(scanner, "Nhập mật khẩu mới: ");
+            String passwordConfirm = inputString(scanner, "Nhập lại mật khẩu mới để xác nhận: ");
+
+            if (passwordNew.equals(passwordConfirm)) {
+                break;
+            } else {
+                System.out.println("Lỗi: Mật khẩu nhập lại không trùng khớp! Vui lòng nhập lại.");
+                System.out.println("---------------------------------------------------------");
+            }
+        }
+
+        // 3. Tiến hành lưu mật khẩu mới
+        // Bỏ mật khẩu mới vào máy xay PasswordHasher để biến thành chuỗi ký tự lạ
+        currentStudent.setPassword(PasswordBcrypt.passwordBcrypt(passwordNew));
+
+        // Cập nhật vào cơ sở dữ liệu
         if (studentService.updateStudent(currentStudent)) {
             System.out.println("Đổi mật khẩu thành công!");
         } else {

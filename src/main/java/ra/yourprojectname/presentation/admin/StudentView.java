@@ -3,7 +3,7 @@ package ra.yourprojectname.presentation.admin;
 import ra.yourprojectname.business.StudentService;
 import ra.yourprojectname.business.impl.StudentServiceImpl;
 import ra.yourprojectname.model.Student;
-import ra.yourprojectname.until.PasswordHasher;
+import ra.yourprojectname.until.PasswordBcrypt;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -166,8 +166,8 @@ public class StudentView {
                     student.setPhone(inputPhone(scanner, "Nhập SĐT mới: "));
                     break;
                 case 6:
-                    System.out.print("Mật khẩu mới: ");
-                    student.setPassword(PasswordHasher.hashPassword(scanner.nextLine().trim()));
+                    String passNew = inputString(scanner, "Nhập mật khẩu mới: ");
+                    student.setPassword(PasswordBcrypt.passwordBcrypt(passNew));
                     break;
                 case 7:
                     isEditing = false;
@@ -175,12 +175,11 @@ public class StudentView {
                 default:
                     System.out.println("Vui lòng nhập từ 1 đến 6!");
             }
-
-            if (studentService.updateStudent(student)) {
-                System.out.println("Cập nhật thông tin học viên thành công!");
-            } else {
-                System.out.println("Cập nhật thất bại!");
-            }
+        }
+        if (studentService.updateStudent(student)) {
+            System.out.println("Cập nhật thông tin học viên thành công!");
+        } else {
+            System.out.println("Cập nhật thất bại!");
         }
     }
 
@@ -279,7 +278,7 @@ public class StudentView {
                 totalPages = 1;
             }
             int offset = (currentPage - 1) * pageSize;
-            List<Student> list = studentService.sortStudents(column,direction, pageSize, offset);
+            List<Student> list = studentService.sortStudents(column, direction, pageSize, offset);
             System.out.printf("\n--- DANH SÁCH SẮP XẾP [%s - %s] (TRANG %d / %d) ---\n", column.toUpperCase(), direction, currentPage, totalPages);
             printStudentTable(list);
 

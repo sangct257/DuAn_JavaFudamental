@@ -57,15 +57,15 @@ public class StatisticalView {
         System.out.println("\n--- THỐNG KÊ TỔNG QUAN TOÀN HỆ THỐNG ---");
         Map<String, Integer> data = statisticalService.getTotalOverview();
 
-        int totalCourses = data.getOrDefault("TOTAL_COURSES", 0);
-        int totalStudents = data.getOrDefault("TOTAL_STUDENTS", 0);
+        int totalCourses = data.getOrDefault("total_courses", 0);
+        int totalStudents = data.getOrDefault("total_students", 0);
 
-        System.out.println("-----------------------------------------");
-        System.out.printf("| %-25s | %-9s |\n", "HẠNG MỤC THỐNG KÊ", "SỐ LƯỢNG");
-        System.out.println("-----------------------------------------");
-        System.out.printf("| %-25s | %-9d |\n", "Tổng số khóa học hiện có", totalCourses);
-        System.out.printf("| %-25s | %-9d |\n", "Tổng số học viên kích hoạt", totalStudents);
-        System.out.println("-----------------------------------------");
+        System.out.println("------------------------------------------");
+        System.out.printf("| %-26s | %-9s |\n", "HẠNG MỤC THỐNG KÊ", "SỐ LƯỢNG");
+        System.out.println("------------------------------------------");
+        System.out.printf("| %-26s | %-9d |\n", "Tổng số khóa học hiện có", totalCourses);
+        System.out.printf("| %-26s | %-9d |\n", "Tổng số học viên kích hoạt", totalStudents);
+        System.out.println("------------------------------------------");
     }
 
     // Case 2: Số lượng học viên từng lớp
@@ -91,17 +91,17 @@ public class StatisticalView {
 
     // Hàm dùng chung để in bảng dữ liệu thống kê dạng Map<Tên khóa học, Số lượng>
     private void printStatisticalTable(Map<String, Integer> data, String emptyMessage) {
-        System.out.println("---------------------------------------------------------");
-        System.out.printf("| %-40s | %-10s |\n", "TÊN KHÓA HỌC", "SỐ HỌC VIÊN");
-        System.out.println("---------------------------------------------------------");
+        System.out.println("----------------------------------------------------------");
+        System.out.printf("| %-40s | %-11s |\n", "TÊN KHÓA HỌC", "SỐ HỌC VIÊN");
+        System.out.println("----------------------------------------------------------");
 
         if (data == null || data.isEmpty()) {
             System.out.printf("| %-53s |\n", emptyMessage);
         } else {
             for (Map.Entry<String, Integer> entry : data.entrySet()) {
-                System.out.printf("| %-40s | %-10d |\n", entry.getKey(), entry.getValue());
+                System.out.printf("| %-40s | %-11d |\n", entry.getKey(), entry.getValue());
             }
         }
-        System.out.println("---------------------------------------------------------");
+        System.out.println("----------------------------------------------------------");
     }
 }
