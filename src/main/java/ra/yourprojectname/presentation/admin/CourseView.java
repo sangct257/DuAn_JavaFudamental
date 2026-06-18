@@ -133,12 +133,19 @@ public class CourseView {
     public void updateCourse(Scanner scanner) {
         showCourseList(scanner);
         System.out.println("\n--- CHỈNH SỬA THÔNG TIN KHÓA HỌC ---");
-        int id = inputInt(scanner, "Nhập ID khoá học muốn sửa: ");
 
-        Course course = courseService.getCourseById(id);
-        if (course == null) {
+        Course course = null;
+        while (true) {
+            int id = inputInt(scanner, "Nhập ID khoá học muốn sửa (hoặc nhập 0 để quay lại): ");
+            if (id == 0) {
+                return;
+            }
+            course = courseService.getCourseById(id);
+
+            if (course != null) {
+                break;
+            }
             System.out.println("Không tìm thấy khoá học có ID: " + id);
-            return;
         }
 
         boolean isEditing = true;
@@ -170,10 +177,12 @@ public class CourseView {
                     System.out.println("Lựa chọn không hợp lệ!");
             }
 
-            if (courseService.updateCourse(course)) {
-                System.out.println("Cập nhập thông tin thành công!");
-            } else {
-                System.out.println("Cập nhập thông tin thất bại!");
+            if (choise >= 1 && choise <= 3) {
+                if (courseService.updateCourse(course)) {
+                    System.out.println("Cập nhật thông tin thành công!");
+                } else {
+                    System.out.println("Cập nhật thông tin thất bại!");
+                }
             }
         }
     }
@@ -182,16 +191,26 @@ public class CourseView {
     public void deleteCourse(Scanner scanner) {
         showCourseList(scanner);
         System.out.println("\n--- XÓA KHÓA HỌC ---");
-        int id = inputInt(scanner, "Nhập ID khoá học cần xoá: ");
-        Course course = courseService.getCourseById(id);
-        if (course == null) {
+        Course course = null;
+        while (true) {
+            int id = inputInt(scanner, "Nhập ID khoá học cần xoá (hoặc nhập 0 để quay lại): ");
+            if (id == 0){
+                return;
+            }
+            course = courseService.getCourseById(id);
+            if (course == null) {
+                break;
+            }
             System.out.println("Không tìm thấy ID khoá học cần xoá!");
-            return;
+        }
+        if(courseService.hasStudentsEnrolled(course.getId())){
+            System.out.println("Lỗi: Khóa học [" + course.getName() + "] đã có học viên đăng ký tham gia. Không thể xóa khóa học này!");
+            return; // Kết thúc hàm
         }
         System.out.printf("Bạn có chắc chắn muốn xóa khóa học [%s] không? (Y/N): ", course.getName());
         String confirm = scanner.nextLine().trim().toUpperCase();
         if (confirm.matches("Y")) {
-            if (courseService.deleteCourse(id)) {
+            if (courseService.deleteCourse(course.getId())) {
                 System.out.println("Xoá thành công khoá học!");
             } else {
                 System.out.println("Xoá khoá học thất bại!");

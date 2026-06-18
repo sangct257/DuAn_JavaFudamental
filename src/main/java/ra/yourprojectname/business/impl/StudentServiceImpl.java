@@ -88,4 +88,9 @@ public class StudentServiceImpl implements StudentService {
         return studentDAO.sortStudents(column, direction, limit, offset);
     }
 
+    @Override
+    public boolean hasStudentsEnrolled(int courseId) {
+        return studentDAO.hasStudentsEnrolled(courseId);
+    }
+
 }

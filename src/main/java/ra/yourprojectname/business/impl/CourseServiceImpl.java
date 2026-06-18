@@ -63,4 +63,9 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> sortCourses(String column, String direction, int limit, int offset) {
         return courseDAO.sortCourses(column, direction, limit, offset);
     }
+
+    @Override
+    public boolean hasStudentsEnrolled(int courseId) {
+        return courseDAO.hasStudentsEnrolled(courseId);
+    }
 }

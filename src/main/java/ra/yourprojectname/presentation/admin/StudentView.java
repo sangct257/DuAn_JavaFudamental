@@ -130,11 +130,17 @@ public class StudentView {
     private void updateStudent(Scanner scanner) {
         showStudentList(scanner);
         System.out.println("\n--- CHỈNH SỬA THÔNG TIN HỌC VIÊN ---");
-        int id = inputInt(scanner, "Nhập ID học viên cần sửa: ");
-        Student student = studentService.getStudentById(id);
-        if (student == null) {
+        Student student = null;
+        while (true){
+            int id = inputInt(scanner, "Nhập ID học viên cần sửa: ");
+            if (id == 0) {
+                return;
+            }
+            student = studentService.getStudentById(id);
+            if (student != null) {
+                break;
+            }
             System.out.println("Không tìm thấy học viên mang ID này!");
-            return;
         }
 
         boolean isEditing = true;
@@ -187,17 +193,29 @@ public class StudentView {
     private void deleteStudent(Scanner scanner) {
         showStudentList(scanner);
         System.out.println("\n--- XÓA HỌC VIÊN ---");
-        int id = inputInt(scanner, "Nhập ID cần xóa: ");
-        Student student = studentService.getStudentById(id);
-        if (student == null) {
+
+        Student student = null;
+        while (true) {
+            int id = inputInt(scanner, "Nhập ID cần xóa (hoặc nhập 0 để quay lại): ");
+            if (id == 0) {
+                return;
+            }
+            student = studentService.getStudentById(id);
+            if (student != null) {
+                break;
+            }
             System.out.println("Không tìm thấy học viên cần xóa!");
-            return;
+        }
+
+        if (studentService.hasStudentsEnrolled(student.getId())) {
+            System.out.println("Học viên [" + student.getName() + "] đã có khoá đăng ký tham gia. Không thể xóa học viên này!");
+            return; // kết thúc hám
         }
 
         System.out.printf("Bạn có chắc chắn muốn xóa học viên [%s] không? (Y/N): ", student.getName());
         String confirm = scanner.nextLine().trim().toUpperCase();
         if (confirm.matches("Y")) {
-            if (studentService.deleteStudent(id)) {
+            if (studentService.deleteStudent(student.getId())) {
                 System.out.println("Đã xóa thành công!");
             } else {
                 System.out.println("Xoá thất bại!");

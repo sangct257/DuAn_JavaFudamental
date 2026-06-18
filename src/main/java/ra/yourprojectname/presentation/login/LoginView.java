@@ -75,11 +75,6 @@ public class LoginView {
 
             if (password.isEmpty()) {
                 System.err.println("Lỗi: Mật khẩu không được để trống!");
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
                 continue;
             }
             break;

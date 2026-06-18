@@ -12,8 +12,12 @@ import ra.yourprojectname.model.EnrollmentStatus;
 import ra.yourprojectname.model.Student;
 import ra.yourprojectname.until.PasswordBcrypt;
 
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class StudentView {
@@ -146,18 +150,24 @@ public class StudentView {
     private void addEnrollment(Scanner scanner) {
         showCourseList(scanner);
         System.out.println("\n--- ĐĂNG KÝ KHÓA HỌC MỚI ---");
-        int id = inputInt(scanner, "Nhập ID khoá học muốn đăng ký: ");
-        Course course = courseService.getCourseById(id);
-        if (course == null) {
+        Course course = null;
+        while (true) {
+            int id = inputInt(scanner, "Nhập ID khoá học muốn đăng ký (hoặc nhập 0 để quay lại): ");
+            if (id == 0) {
+                break;
+            }
+            course = courseService.getCourseById(id);
+            if (course != null) {
+                return;
+            }
             System.out.println("Không tìm thấy khóa học với ID này!");
-            return;
         }
 
         // Duyệt qua danh sách đăng ký khoá học
         List<Enrollment> myHistory = enrollmentService.getEnrollmentsByStudent(currentStudent.getId(), 200, 0);
         Enrollment existEnrollment = null;
         for (Enrollment e : myHistory) {
-            if (e.getCourse().getId() == id) {
+            if (e.getCourse().getId() == course.getId()) {
                 existEnrollment = e;
                 break;
             }
@@ -179,7 +189,7 @@ public class StudentView {
 
             String confirm = scanner.nextLine().trim();
             if (confirm.equalsIgnoreCase("Y")){
-                if (enrollmentService.updateEnrollmentStatus(currentStudent.getId(), id, EnrollmentStatus.WAITING)) {
+                if (enrollmentService.updateEnrollmentStatus(currentStudent.getId(), course.getId(), EnrollmentStatus.WAITING)) {
                     System.out.println("Đăng ký lại thành công! Trạng thái đơn quay về: WAITING (Chờ admin duyệt)!");
                 } else {
                     System.out.println("Đăng ký lại thất bại!");
@@ -248,12 +258,38 @@ public class StudentView {
                 continue;
             }
             if (action.matches("F")) {
-                System.out.print("Sắp xếp theo (1: Tên khóa học | 2: Ngày đăng ký): ");
-                column = scanner.nextLine().trim().equals("1") ? "c.name" : "e.registered_at";
-                System.out.print("Thứ tự hiển thị (1: Tăng dần [ASC] | 2: Giảm dần [DESC]): ");
-                direction = scanner.nextLine().trim().equals("1") ? "ASC" : "DESC";
-                useSort = true; // Kích hoạt trạng thái lấy dữ liệu kèm Sort lệnh SQL
-                currentPage = 1; // Đưa về trang thứ nhất để áp dụng cấu trúc sắp xếp mới
+                // 1. Vòng lặp bắt nhập Tiêu chí sắp xếp
+                while (true) {
+                    System.out.print("Sắp xếp theo (1: Tên khóa học | 2: Ngày đăng ký): ");
+                    String chooseCol = scanner.nextLine().trim();
+                    if (chooseCol.equals("1")) {
+                        column = "c.name";
+                        break;
+                    } else if (chooseCol.equals("2")) {
+                        column = "e.registered_at";
+                        break;
+                    } else {
+                        System.out.println("Lựa chọn không hợp lệ! Vui lòng chỉ nhập 1 hoặc 2.");
+                    }
+                }
+
+                // 2. Vòng lặp bắt nhập Chiều sắp xếp
+                while (true) {
+                    System.out.print("Thứ tự hiển thị (1: Tăng dần [ASC] | 2: Giảm dần [DESC]): ");
+                    String chooseDir = scanner.nextLine().trim();
+                    if (chooseDir.equals("1")) {
+                        direction = "ASC";
+                        break;
+                    } else if (chooseDir.equals("2")) {
+                        direction = "DESC";
+                        break;
+                    } else {
+                        System.out.println("Lựa chọn không hợp lệ! Vui lòng chỉ nhập 1 hoặc 2.");
+                    }
+                }
+
+                useSort = true;
+                currentPage = 1;
                 continue;
             }
             System.out.println("Lệnh không hợp lệ! Vui lòng chỉ nhập P, N hoặc E.");
@@ -359,7 +395,9 @@ public class StudentView {
             }
         }
     }
+
     public void printCourseTable(List<Course> list) {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         System.out.println("--------------------------------------------------------------------------------------------------");
         System.out.printf("| %-5s | %-25s | %-12s | %-20s | %-20s |\n", "ID", "TÊN KHÓA HỌC", "THỜI LƯỢNG", "GIẢNG VIÊN", "NGÀY TẠO");
         System.out.println("--------------------------------------------------------------------------------------------------");
@@ -368,7 +406,8 @@ public class StudentView {
         } else {
             for (Course course : list) {
                 System.out.printf("| %-5d | %-25s | %-10d H | %-20s | %-20s |\n",
-                        course.getId(), course.getName(), course.getDuration(), course.getInstructor(), course.getCreateAt());
+                        course.getId(), course.getName(), course.getDuration(), course.getInstructor(),
+                        dateFormat.format(course.getCreateAt()));
             }
         }
         System.out.println("--------------------------------------------------------------------------------------------------");

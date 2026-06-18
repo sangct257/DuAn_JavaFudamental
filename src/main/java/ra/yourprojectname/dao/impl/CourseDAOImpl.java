@@ -245,4 +245,25 @@ public class CourseDAOImpl implements CourseDAO {
         }
         return list;
     }
+
+    public boolean hasStudentsEnrolled(int courseId) {
+        Connection con;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        con = DBUtility.openConnection();
+        try {
+            // Đếm xem trong bảng Enrollment có dòng nào chứa course_id này không
+            pstmt = con.prepareStatement("SELECT COUNT(*) FROM Enrollment WHERE course_id = ?");
+            pstmt.setInt(1, courseId);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Nếu lớn hơn 0 nghĩa là đã có học viên đăng ký
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBUtility.closeConnection(rs, pstmt, con);
+        }
+        return false;
+    }
 }

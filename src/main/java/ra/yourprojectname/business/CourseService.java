@@ -23,4 +23,7 @@ public interface CourseService {
     int getTotalCoursesByName(String name);
     // Sắp xếp khóa học (theo tên/id - tăng dần/giảm dần) có phân trang
     List<Course> sortCourses(String column, String direction, int limit, int offset);
+
+    // Kiểm tra sinh viên đã đăng ký khoá học chưa
+    boolean hasStudentsEnrolled(int courseId);
 }

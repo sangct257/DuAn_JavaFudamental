@@ -199,7 +199,7 @@ public class EnrollmentView {
             System.out.printf("\n--- DANH SÁCH ĐĂNG KÝ HỌC VIÊN TOÀN HỆ THỐNG (TRANG %d/%d) ---\n", currentPage, totalPages);
             printEnrollmentTable(listOnPage);
 
-            // 🌟 Sửa menu lựa chọn rõ ràng: Bấm D để chọn xóa
+            // Sửa menu lựa chọn rõ ràng: Bấm D để chọn xóa
             System.out.print("\n[P]: Trang trước  |  [N]: Trang kế  |  [D]: Chọn xóa học viên trang này  |  [E]: Thoát  | Lựa chọn: ");
             String action = scanner.nextLine().trim().toUpperCase();
 
@@ -215,7 +215,7 @@ public class EnrollmentView {
                 continue;
             }
 
-            // 🌟 Gom toàn bộ logic nhập ID xóa vào block 'D'
+            // Gom toàn bộ logic nhập ID xóa vào block 'D'
             if (action.equals("D")) {
                 System.out.print("\nNhập ID Học viên muốn loại bỏ: ");
                 int studentId = inputInt(scanner);
@@ -225,6 +225,11 @@ public class EnrollmentView {
                 Enrollment target = findEnrollment(listOnPage, studentId, courseId);
                 if (target == null) {
                     System.out.println("Không tìm thấy thông tin đăng ký khóa học khớp với dữ liệu trên trang này!");
+                    continue;
+                }
+
+                if ("CONFIRMED".equalsIgnoreCase(String.valueOf(target.getStatus()))) {
+                    System.out.println("Học viên này đã được duyệt duyệt thành công (CONFIRMED) vào khóa học. Không thể xóa bỏ!");
                     continue;
                 }
 
@@ -241,7 +246,7 @@ public class EnrollmentView {
                 } else {
                     System.out.println("Đã hủy thao tác xóa học viên.");
                 }
-                continue; // 🌟 Thêm continue để lặp lại từ đầu
+                continue;
             }
 
             // Dòng này chỉ chạy khi action KHÔNG PHẢI là P, N, E, D

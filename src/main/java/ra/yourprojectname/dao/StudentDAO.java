@@ -27,4 +27,7 @@ public interface StudentDAO {
     List<Student> searchStudent(String keyword, int limit, int offset);
     // Sắp xếp học viên (theo tên/id - tăng dần/giảm dần)
     List<Student> sortStudents(String column, String direction, int limit, int offset);
+
+    // Kiểm tra sinh viên đã đăng ký khoá học chưa
+    boolean hasStudentsEnrolled(int courseId);
 }
